@@ -1,4 +1,15 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  Res,
+  HttpStatus,
+} from '@nestjs/common';
+import { Response } from 'express';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -8,13 +19,23 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Post()
-  create(@Body() createUserDto: CreateUserDto) {
-    return this.usersService.create(createUserDto);
+  async create(@Body() createUserDto: CreateUserDto, @Res() res: Response) {
+    const createUser = await this.usersService.create(createUserDto);
+    return res.status(HttpStatus.CREATED).json({
+      message: 'User created successfully',
+      data: createUser,
+      statusCode: HttpStatus.CREATED,
+    });
   }
 
   @Get()
-  findAll() {
-    return this.usersService.findAll();
+  async findAll(@Res() res: Response) {
+    const users = await this.usersService.findAll();
+    return res.status(HttpStatus.OK).json({
+      statusCode: HttpStatus.OK,
+      data: users,
+      message: 'All users fetched successfully',
+    });
   }
 
   @Get(':id')

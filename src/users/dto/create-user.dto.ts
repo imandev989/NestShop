@@ -5,6 +5,7 @@ import {
   IsOptional,
   IsString,
   Length,
+  Matches,
   //   Matches,
   MinLength,
 } from 'class-validator';
@@ -13,7 +14,7 @@ import UserRoleEnum from '../enums/userRoleEnum';
 export class CreateUserDto {
   @IsString({ message: 'mobile number must be a string' })
   @Length(11, 11, { message: 'mobile number must be 11 characters' })
-  //   @Matches(/^[0-9]{11}$/, { message: 'mobile number must be numeric' })
+  @Matches(/^[0-9]{11}$/, { message: 'mobile number must be numeric' })
   @IsNotEmpty({ message: 'mobile number is required' })
   @Transform(({ value }) => value.trim())
   mobile: string;
