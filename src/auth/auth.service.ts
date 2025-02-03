@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { User } from 'src/users/entities/user.entity';
@@ -24,5 +24,17 @@ export class AuthService {
       display_name,
       role: UserRoleEnum.NormalUser,
     });
+  }
+
+  async login(mobile: string, password: string): Promise<void> {
+    const user: User = await this.userService.findOneByMobile(mobile);
+    if (!(await bcrypt.compare(password, user.password)))
+      throw new UnauthorizedException('Invalid Password');
+
+    const payload = {
+      mobile: user.mobile,
+      sub: user.id,
+      display_name: user.display_name,
+    };
   }
 }
