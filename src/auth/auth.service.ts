@@ -27,7 +27,10 @@ export class AuthService {
     });
   }
 
-  async login(mobile: string, password: string): Promise<void> {
+  async login(
+    mobile: string,
+    password: string,
+  ): Promise<{ accessToken: string }> {
     const user: User = await this.userService.findOneByMobile(mobile);
     if (!(await bcrypt.compare(password, user.password)))
       throw new UnauthorizedException('Invalid Password');
