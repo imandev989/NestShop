@@ -7,7 +7,7 @@ import {
   MinLength,
 } from 'class-validator';
 
-export class RegisterDto {
+export class LoginDto {
   @IsString({ message: 'mobile number must be a string' })
   @IsNotEmpty({ message: 'mobile number is required' })
   @Matches(/^[0-9]{11}$/, { message: 'mobile number must be numeric' })

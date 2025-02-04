@@ -18,12 +18,16 @@ export class UsersService {
   ) {}
   async create(createUserDto: CreateUserDto) {
     try {
-      const newUser = this.userRepository.create(createUserDto);
-      return await this.userRepository.save(newUser);
-    } catch (error) {
-      throw new BadRequestException(
-        'We have Problem when created new user. may be user exist. please try again',
+      const alreadyUser = await this.findOneByMobile(
+        createUserDto.mobile,
+        true,
       );
+      if (!alreadyUser) {
+        const newUser = this.userRepository.create(createUserDto);
+        return await this.userRepository.save(newUser);
+      } else throw new BadRequestException('User already exist');
+    } catch (error) {
+      throw error;
     }
   }
 
@@ -44,9 +48,13 @@ export class UsersService {
     return user;
   }
 
-  async findOneByMobile(mobile: string): Promise<User> {
+  async findOneByMobile(
+    mobile: string,
+    checkExist: boolean = false,
+  ): Promise<User> {
     const user: User = await this.userRepository.findOneBy({ mobile: mobile });
-    if (!user) throw new NotFoundException(`User ${mobile} not found`);
+    if (!checkExist)
+      if (!user) throw new NotFoundException(`User ${mobile} not found`);
     return user;
   }
 
