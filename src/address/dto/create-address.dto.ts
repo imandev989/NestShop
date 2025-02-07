@@ -1,6 +1,8 @@
 import { IsNotEmpty, IsOptional, IsString, Length } from 'class-validator';
 
 export class CreateAddressDto {
+  @IsNotEmpty({ message: 'userId is required' })
+  userId: number;
   @IsString({ message: 'province must be a string' })
   @IsNotEmpty({ message: 'province is required' })
   province: string;
