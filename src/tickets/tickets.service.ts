@@ -16,9 +16,12 @@ export class TicketsService {
   async create(createTicketDto: CreateTicketDto): Promise<Ticket> {
     const { userId, replyTo, ...TicketDto } = createTicketDto;
     const user = await this.userService.findOne(userId);
-    const replyToTicket = await this.ticketRepository.findOneByOrFail({
-      id: replyTo,
-    });
+    let replyToTicket = null;
+    if (replyTo) {
+      replyToTicket = await this.ticketRepository.findOneByOrFail({
+        id: replyTo,
+      });
+    }
     const ticket = this.ticketRepository.create({
       ...TicketDto,
       user,
