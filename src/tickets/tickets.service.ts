@@ -18,9 +18,13 @@ export class TicketsService {
     const user = await this.userService.findOne(userId);
     let replyToTicket = null;
     if (replyTo) {
-      replyToTicket = await this.ticketRepository.findOneByOrFail({
-        id: replyTo,
+      replyToTicket = await this.ticketRepository.findOne({
+        where: { id: replyTo },
+        relations: ['replyTo'],
       });
+      if (replyToTicket.replyTo) {
+        throw new Error('Cannot reply to a reply');
+      }
     }
     const ticket = this.ticketRepository.create({
       ...TicketDto,
@@ -30,9 +34,18 @@ export class TicketsService {
     return this.ticketRepository.save(ticket);
   }
 
-  // findAll() {
-  //   return `This action returns all tickets`;
-  // }
+  async findAll() {
+    const tickets = await this.ticketRepository
+      .createQueryBuilder('tickets')
+      .where('tickets.replyTo IS NULL')
+      .getMany();
+
+    return tickets;
+    // return await this.ticketRepository.find({
+    //   where: { replyTo: null },
+    //   relations: ['replyTo'],
+    // });
+  }
 
   // findOne(id: number) {
   //   return `This action returns a #${id} ticket`;
