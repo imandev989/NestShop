@@ -47,9 +47,13 @@ export class TicketsService {
     // });
   }
 
-  // findOne(id: number) {
-  //   return `This action returns a #${id} ticket`;
-  // }
+  async findOne(id: number) {
+    const ticket = await this.ticketRepository.findOneOrFail({
+      where: { id },
+      relations: ['replies', 'replyTo'],
+    });
+    return ticket;
+  }
 
   // update(id: number, updateTicketDto: UpdateTicketDto) {
   //   return `This action updates a #${id} ticket`;

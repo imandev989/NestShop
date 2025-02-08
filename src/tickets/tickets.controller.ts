@@ -6,6 +6,7 @@ import {
   HttpStatus,
   Res,
   Get,
+  Param,
   // Patch,
   // Param,
   // Delete,
@@ -40,10 +41,16 @@ export class TicketsController {
     });
   }
 
-  // @Get(':id')
-  // findOne(@Param('id') id: string) {
-  //   return this.ticketsService.findOne(+id);
-  // }
+  @Get(':id')
+  async findOne(@Param('id') id: string, @Res() res: Response) {
+    const ticket = await this.ticketsService.findOne(+id);
+
+    return res.status(HttpStatus.OK).json({
+      statusCode: HttpStatus.OK,
+      data: ticket,
+      message: 'ticket found successfully',
+    });
+  }
 
   // @Patch(':id')
   // update(@Param('id') id: string, @Body() updateTicketDto: UpdateTicketDto) {
