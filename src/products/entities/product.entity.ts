@@ -6,11 +6,13 @@ import {
   JoinColumn,
   JoinTable,
   ManyToMany,
+  PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 
 @Entity('products')
 export class Product {
+  @PrimaryGeneratedColumn()
   id: number;
 
   @Column({ nullable: false })
