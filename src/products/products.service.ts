@@ -5,6 +5,7 @@ import { Category } from 'src/categories/entities/category.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { In, Repository } from 'typeorm';
 import { Product } from './entities/product.entity';
+import { UpdateProductDto } from './dto/update-product.dto';
 
 @Injectable()
 export class ProductsService {
@@ -42,7 +43,26 @@ export class ProductsService {
   }
 
   async findAll(): Promise<Product[]> {
-    return await this.productRepository.find({ relations: ['relations'] });
+    return await this.productRepository.find({ relations: ['categories'] });
+  }
+
+  async update(id: number, updateProductDto: UpdateProductDto) {
+    const { title, price, description, stock, categoryIds } = updateProductDto;
+    const product: Product = await this.findOne(id);
+    if (title) product.title = title;
+    if (price) product.price = price;
+    if (description) product.description = description;
+    if (stock) product.stock = stock;
+    if (categoryIds) {
+      const categories = await this.categoryRepository.find({
+        where: {
+          id: In(Array.isArray(categoryIds) ? categoryIds : [categoryIds]),
+        },
+      });
+      product.categories = categories;
+    }
+
+    return await this.productRepository.save(product);
   }
 
   async findOne(id: number): Promise<Product> {
