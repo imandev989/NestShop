@@ -6,13 +6,15 @@ import { Product } from './entities/product.entity';
 import { In, Repository } from 'typeorm';
 import { Category } from '../categories/entities/category.entity';
 import { UsersService } from 'src/users/users.service';
+import { BookmarkProduct } from './entities/product-bookmark.entity';
 
 @Injectable()
 export class ProductsService {
   constructor(
     @InjectRepository(Product)
     private readonly productsRepository: Repository<Product>,
-
+    @InjectRepository(BookmarkProduct)
+    private readonly bookmarkProductRepository: Repository<BookmarkProduct>,
     @InjectRepository(Category)
     private readonly categoryRepository: Repository<Category>,
     private readonly userService: UsersService,
@@ -70,5 +72,41 @@ export class ProductsService {
     });
     if (!product) throw new NotFoundException('Product not found');
     return product;
+  }
+  async toggleBookmark(
+    userId: number,
+    productId: number,
+  ): Promise<BookmarkProduct | void> {
+    // Check if the user and product exist
+    const user = await this.userService.findOne(userId);
+    const product = await this.productsRepository.findOne({
+      where: { id: productId },
+    });
+
+    if (!user || !product) {
+      throw new NotFoundException('User or product not found');
+    }
+
+    // Check if the bookmark already exists
+    const existingBookmark = await this.bookmarkProductRepository.findOne({
+      where: {
+        user: { id: user.id }, // only user ID
+        product: { id: product.id }, // only product ID
+      },
+    });
+
+    console.log(existingBookmark);
+
+    if (existingBookmark) {
+      // If the bookmark exists, remove it
+      await this.bookmarkProductRepository.remove(existingBookmark);
+    } else {
+      // If the bookmark does not exist, create it
+      const newBookmark = this.bookmarkProductRepository.create({
+        user: user,
+        product: product,
+      });
+      return await this.bookmarkProductRepository.save(newBookmark);
+    }
   }
 }
