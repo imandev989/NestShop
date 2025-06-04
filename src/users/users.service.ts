@@ -81,6 +81,52 @@ export class UsersService {
       );
     }
   }
+  // Adds a product to the user's basket
+  async addProductToBasket(userId: number, product: any) {
+    // Find the user along with basket items
+    const user = await this.userRepository.findOne({
+      where: { id: userId },
+      relations: ['basket_items'],
+    });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    // Add the product to the basket
+    user.basket_items.push(product);
+
+    // Save the updated user
+    return await this.userRepository.save(user);
+  }
+
+  // Removes a product from the user's basket
+  async removeProductFromBasket(userId: number, product: any): Promise<void> {
+    // Find the user along with basket items
+    const user = await this.userRepository.findOne({
+      where: { id: userId },
+      relations: ['basket_items'],
+    });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    // Find the index of the product in the basket
+    const productIndex = user.basket_items.findIndex(
+      (item) => item.id === product.id,
+    );
+
+    if (productIndex === -1) {
+      throw new NotFoundException('Product not found in the basket');
+    }
+
+    // Remove the product from the basket
+    user.basket_items.splice(productIndex, 1);
+
+    // Save the updated user
+    await this.userRepository.save(user);
+  }
 
   async remove(id: number): Promise<void> {
     const result = await this.userRepository.delete(id);

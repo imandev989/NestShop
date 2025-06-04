@@ -48,6 +48,38 @@ export class ProductsController {
       message: ' Prdocut saved to bookmark successfully',
     });
   }
+  @Post('add-basket')
+  async addItemToBasket(
+    @Body() bookmarkProduct: BookmarkProductDto,
+    @Res() res: Response,
+  ) {
+    const bookmarkData = await this.productsService.addItemToBasket(
+      bookmarkProduct.user_id,
+      bookmarkProduct.product_id,
+    );
+
+    return res.status(HttpStatus.OK).json({
+      statusCode: HttpStatus.OK,
+      data: bookmarkData,
+      message: ' Product added to basket successfully',
+    });
+  }
+
+  @Post('remove-basket')
+  async removeItemFromBasket(
+    @Body() bookmarkProduct: BookmarkProductDto,
+    @Res() res: Response,
+  ) {
+    await this.productsService.removeItemFromBasket(
+      bookmarkProduct.user_id,
+      bookmarkProduct.product_id,
+    );
+
+    return res.status(HttpStatus.OK).json({
+      statusCode: HttpStatus.OK,
+      message: ' Product removed from basket successfully',
+    });
+  }
 
   @Get()
   async findAll(@Res() res: Response) {

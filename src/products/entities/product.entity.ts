@@ -44,8 +44,8 @@ export class Product {
   })
   categories: Category[];
 
-  // @ManyToMany(() => User, (user) => user.basket_items)
-  // baskets: User[];
+  @ManyToMany(() => User, (user) => user.basket_items)
+  baskets: User[];
 
   @OneToMany(() => BookmarkProduct, (bookmark) => bookmark.product)
   bookmarks: BookmarkProduct[];
